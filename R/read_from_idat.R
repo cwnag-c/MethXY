@@ -1,4 +1,14 @@
-
+#' read_from_idat
+#' @importFrom utils write.csv
+#' @importFrom minfi read.metharray.exp sampleNames
+#' @param targets_dir Location of the targets file
+#' @param idat_dir Location of the idat
+#' @param UniqueID UniqueID
+#' @param pattern "Name_ID_Position" or "ID_Position"
+#'
+#' @return rgset in env
+#' @export
+#'
 read_from_idat<-function(targets_dir,idat_dir,UniqueID,pattern="GM_ID_Position"
 ){
   if(pattern=="GM_ID_Position"){

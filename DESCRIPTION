@@ -1,11 +1,36 @@
 Package: MethXY
-Title: What the Package Does (One Line, Title Case)
+Title: Sex Chromosome Analysis for DNA Methylation Arrays
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Chao", "Wang", , "cwang9973@163.com", role = c("aut", "cre"))
+Description: This package provides tools for analyzing sex chromosomes 
+    using DNA methylation array data. 
+    It offers functions for data preprocessing, quality control, 
+    and statistical analysis tailored to 
+    the unique features of X and Y chromosomes.
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Imports: 
+    CETYGO (>= 0.99.0),
+    data.table,
+    doParallel,
+    dplyr,
+    EpiSmokEr (>= 0.1.0),
+    FlowSorted.Blood.EPIC,
+    foreach,
+    genefilter,
+    limma,
+    magrittr,
+    minfi,
+    nlme,
+    parallel,
+    s20x,
+    S4Vectors,
+    SummarizedExperiment
+Remotes: 
+    sailalithabollepalli/EpiSmokEr,
+    ejh243/CETYGO
+Depends: 
+    R (>= 3.5)
