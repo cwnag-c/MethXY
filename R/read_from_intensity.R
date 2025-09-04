@@ -16,11 +16,17 @@
 #' @export
 #'
 read_from_intensity <- function(targets_dir, DNAmType, UniqueID,
-                                pattern = NULL, detp = NULL, methyl = NULL, unmethyl = NULL, merge = NULL,
+                                pattern = NULL, detp = NULL,
+                                methyl = NULL, unmethyl = NULL,
+                                merge = NULL,
                                 nThread = 12) {
   ## read file####
   targets <- read.csv(targets_dir)
-  GSM_id_pos <- paste0(targets$Sample_Name, "_", targets$Sentrix_ID, "_", targets$Sentrix_Position)
+  GSM_id_pos <- paste0(targets$Sample_Name,
+                       "_",
+                       targets$Sentrix_ID,
+                       "_",
+                       targets$Sentrix_Position)
   id_pos <- paste0(targets$Sentrix_ID, "_", targets$Sentrix_Position)
   if (pattern == 3) {
     detp <- as.data.frame(fread(detp, nThread = nThread))
@@ -47,16 +53,21 @@ read_from_intensity <- function(targets_dir, DNAmType, UniqueID,
   if (!all(ncol(detp) == c(ncol(methyl), ncol(unmethyl)))) {
     stop("detp, methyl, and unmethyl have unequal numbers of columns.")
   }
-  index_tf_detp <- sapply(id_pos, function(x) any(grepl(x, colnames(detp))))
-  index_tf_methyl <- sapply(id_pos, function(x) any(grepl(x, colnames(methyl))))
-  index_tf_unmethyl <- sapply(id_pos, function(x) any(grepl(x, colnames(unmethyl))))
+  index_tf_detp <- sapply(id_pos,
+                          function(x) any(grepl(x, colnames(detp))))
+  index_tf_methyl <- sapply(id_pos,
+                            function(x) any(grepl(x, colnames(methyl))))
+  index_tf_unmethyl <- sapply(id_pos,
+                              function(x) any(grepl(x, colnames(unmethyl))))
   prop_true_detp <- mean(index_tf_detp)
   prop_true_methyl <- mean(index_tf_methyl)
   prop_true_unmethyl <- mean(index_tf_unmethyl)
   if (!all(prop_true_detp == c(prop_true_methyl, prop_true_unmethyl))) {
-    stop("Possible ID mismatch: detp, methyl, and unmethyl may come from different sources.")
+    stop("Possible ID mismatch: detp, methyl,
+         and unmethyl may come from different sources.")
   }
-  ## Ensure that each element in id_pos_t matches at least one item, and that no unmatched cases exist.
+  ## Ensure that each element in id_pos_t matches at least one item,
+  ##and that no unmatched cases exist.
   id_pos_t <- id_pos[index_tf_detp]
   GSM_id_pos_t <- GSM_id_pos[index_tf_detp]
   # Extract index positions
@@ -65,24 +76,38 @@ read_from_intensity <- function(targets_dir, DNAmType, UniqueID,
   index_unmethyl <- sapply(id_pos_t, function(x) grep(x, colnames(unmethyl)))
   # Ensure that each element in id_pos_t matches exactly one item.
   if (any(lengths(index_detp) > 1)) {
-    stop("Duplicate IDs detected in the detp that match target IDs. Please ensure each target ID uniquely corresponds to one methylation column name.")
+    stop("Duplicate IDs detected in the detp that match target IDs.
+         Please ensure each target ID uniquely
+         corresponds to one methylation column name.")
   }
   if (any(lengths(index_methyl) > 1)) {
-    stop("Duplicate IDs detected in the methyl that match target IDs. Please ensure each target ID uniquely corresponds to one methylation column name.")
+    stop("Duplicate IDs detected in the methyl that match target IDs.
+         Please ensure each target ID uniquely
+         corresponds to one methylation column name.")
   }
   if (any(lengths(index_unmethyl) > 1)) {
-    stop("Duplicate IDs detected in the unmethyl that match target IDs. Please ensure each target ID uniquely corresponds to one methylation column name.")
+    stop("Duplicate IDs detected in the unmethyl that match target IDs.
+         Please ensure each target ID uniquely
+         corresponds to one methylation column name.")
   }
 
   if (prop_true_detp == 0) {
-    stop("The target failed to match the column names of detp.This may be because the column names are not in the 'SentrixID_SentrixPosition' format.")
+    stop("The target failed to match the column names of detp.
+         This may be because the column names are not
+         in the 'SentrixID_SentrixPosition' format.")
   } else {
     if (prop_true_detp != 1) {
-      message("Warning: IDs in the target and methylation files do not fully match. Only the intersection of both will be used in subsequent analyses. Please verify your input data.")
+      message("Warning: IDs in the target and methylation files
+              do not fully match.
+              Only the intersection of both will be used
+              in subsequent analyses. Please verify your input data.")
     }
   }
   if (length(id_pos_t) != ncol(detp)) {
-    message("Warning: IDs in the target and methylation files do not fully match. Only the intersection of both will be used in subsequent analyses. Please verify your input data.")
+    message("Warning: IDs in the target and methylation files
+            do not fully match.
+            Only the intersection of both will be used in subsequent analyses.
+            Please verify your input data.")
   }
   ## pData
   pData <- targets[index_tf_detp, ]
@@ -129,7 +154,8 @@ read_from_intensity <- function(targets_dir, DNAmType, UniqueID,
         sep = ","
       )
     } else {
-      stop("Chip type not recognized. Please confirm whether it is 450k or EPIC.")
+      stop("Chip type not recognized.
+           Please confirm whether it is 450k or EPIC.")
     }
   }
   unlink(temp_path, recursive = TRUE)

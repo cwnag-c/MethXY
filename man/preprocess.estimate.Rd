@@ -7,11 +7,11 @@
 preprocess.estimate(
   DNAm_env,
   save_dir = "./",
-  cell.proportion = F,
+  cell.proportion = FALSE,
   CellType = "Blood",
   Referenceset = NULL,
-  predict.smok = F,
-  predict.age = F
+  predict.smok = FALSE,
+  predict.age = FALSE
 )
 }
 \arguments{
@@ -30,9 +30,9 @@ The default value is 'Blood'.}
 \item{Referenceset}{To predict cell composition in blood tissue,
 the path to the reference file must be provided.}
 
-\item{predict.smok}{The default value is 'F'.Whether to predict smoking score.}
+\item{predict.smok}{The default value is 'F'.Whether to predict smoking score}
 
-\item{predict.age}{The default value is 'F'.Whether to predict biological age.}
+\item{predict.age}{The default value is 'F'.Whether to predict biological age}
 }
 \value{
 The predicted information has been

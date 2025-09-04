@@ -1,12 +1,12 @@
-#' anti.trafo
+#' anti_trafo
 #'
 #' @param x x
-#' @param adult.age adult.age
+#' @param adult_age adult_age
 #'
 #' @return res
-anti.trafo <- function(x, adult.age = 20) {
-  ifelse(x < 0, (1 + adult.age) * exp(x) - 1, (1 + adult.age) *
-    x + adult.age)
+anti_trafo <- function(x, adult_age = 20) {
+  ifelse(x < 0, (1 + adult_age) * exp(x) - 1, (1 + adult_age) *
+           x + adult_age)
 }
 
 
@@ -36,8 +36,7 @@ anti.trafo <- function(x, adult.age = 20) {
     data <- x[names(coef2$coeffs)]
     the_sum <- data %*% coef2$coeffs + coef2$intercept
     return(data.frame(the_sum, coef2$n_missing, coef2$missing_probes,
-      stringsAsFactors = FALSE
-    ))
+                      stringsAsFactors = FALSE))
   })
   ages <- do.call("rbind", ages)
   return(ages)
@@ -56,15 +55,15 @@ anti.trafo <- function(x, adult.age = 20) {
 #' @export
 #'
 agep2 <- function(betas,
-                  method = c("horvath", "hannum", "phenoage", "skinblood", "lin", "all"),
+                  method = c("horvath", "hannum", "phenoage",
+                             "skinblood", "lin", "all"),
                   n_missing = TRUE,
                   missing_probes = FALSE) {
   method <- match.arg(method)
-  # data("ageCoefs", package = "DnaMethyXY", envir = environment())
   ages <- switch(method,
     horvath = {
       pre <- .compute_ages(betas = betas, coeff = ageCoefs[["Horvath"]])
-      pre[, 1] <- anti.trafo(pre[, 1], adult.age = 20)
+      pre[, 1] <- anti_trafo(pre[, 1], adult_age = 20)
       colnames(pre) <- c(
         "horvath.age", "horvath.n_missing",
         "horvath.missing_probes"
@@ -86,7 +85,7 @@ agep2 <- function(betas,
     },
     skinblood = {
       pre <- .compute_ages(betas = betas, coeff = ageCoefs[["SkinBlood"]])
-      pre[, 1] <- anti.trafo(pre[, 1], adult.age = 20)
+      pre[, 1] <- anti_trafo(pre[, 1], adult_age = 20)
       colnames(pre) <- c(
         "skinblood.age", "skinblood.n_missing",
         "skinblood.missing_probes"

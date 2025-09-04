@@ -4,7 +4,12 @@
 \alias{methxy.dmp}
 \title{methxy.dmp}
 \usage{
-methxy.dmp(matrix, Design.matrix, use_eBayes = F, adjust.method = "bonferroni")
+methxy.dmp(
+  matrix,
+  Design.matrix,
+  use_eBayes = FALSE,
+  adjust.method = "bonferroni"
+)
 }
 \arguments{
 \item{matrix}{beta or M matrix.}

@@ -11,13 +11,14 @@
 #' @export
 #'
 methxy.dmp <- function(matrix, Design.matrix,
-                       use_eBayes = F,
+                       use_eBayes = FALSE,
                        adjust.method = "bonferroni") {
   if (use_eBayes) {
     fit <- lmFit(matrix, Design.matrix)
     fitE <- eBayes(fit)
     if (adjust.method == "BH") {
-      DMPs <- topTable(fit = fitE, adjust.method = "BH", number = nrow(matrix), coef = 2)
+      DMPs <- topTable(fit = fitE, adjust.method = "BH",
+                       number = nrow(matrix), coef = 2)
     } else {
       if (adjust.method == "bonferroni") {
         DMPs <- topTable(fit = fitE, adjust.method = "bonferroni", number = nrow(matrix), coef = 2)

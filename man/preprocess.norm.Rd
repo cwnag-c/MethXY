@@ -7,9 +7,9 @@
 preprocess.norm(
   DNAm_env,
   Norm = "preprocessQuantile",
-  save_result_locally = F,
+  save_result_locally = FALSE,
   save_dir = "./",
-  return_res = T
+  return_res = TRUE
 )
 }
 \arguments{

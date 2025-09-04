@@ -9,7 +9,7 @@
 #' @export
 #'
 VarCpG <- function(row, Sample_Group, Probe_name) {
-  lev <- levene.test(row ~ Sample_Group, show.table = F, digit = 200)
+  lev <- levene.test(row ~ Sample_Group, show.table = FALSE, digit = 200)
   bar <- bartlett.test(row ~ Sample_Group)
   fli <- fligner.test(row ~ Sample_Group)
   res <- data.frame(
@@ -62,16 +62,16 @@ methxy.vmp <- function(matrix, design, Sample_Group, cores = 10, chunks = 10) {
   resid_control <- Residuals[, which(Sample_Group == "0")]
   rm(Residuals)
   Mean_cases <- apply(resid_case, 1, function(x) {
-    mean(x, na.rm = T)
+    mean(x, na.rm = TRUE)
   })
   Variance_cases <- apply(resid_case, 1, function(x) {
-    var(x, na.rm = T)
+    var(x, na.rm = TRUE)
   })
   Mean_controls <- apply(resid_control, 1, function(x) {
-    mean(x, na.rm = T)
+    mean(x, na.rm = TRUE)
   })
   Variance_controls <- apply(resid_control, 1, function(x) {
-    var(x, na.rm = T)
+    var(x, na.rm = TRUE)
   })
   rm(resid_case, resid_control)
   df <- data.frame(

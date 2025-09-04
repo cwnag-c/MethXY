@@ -9,29 +9,42 @@
 #' @return rgset in env
 #' @export
 #'
-read_from_idat <- function(targets_dir, idat_dir, UniqueID, pattern = "GM_ID_Position") {
+read_from_idat <- function(targets_dir,
+                           idat_dir,
+                           UniqueID,
+                           pattern = "GM_ID_Position") {
   if (pattern == "GM_ID_Position") {
     targets <- read.csv(targets_dir)
     required_cols <- c("Sample_Name", "Sentrix_ID", "Sentrix_Position")
     if (all(required_cols %in% colnames(targets))) {
-      targets$Basename <- paste0(idat_dir, "/", targets$Sample_Name, "_", targets$Sentrix_ID, "_", targets$Sentrix_Position)
+      targets$Basename <- paste0(idat_dir, "/",
+                                 targets$Sample_Name,
+                                 "_",
+                                 targets$Sentrix_ID,
+                                 "_",
+                                 targets$Sentrix_Position)
     } else {
       missing_cols <- required_cols[!required_cols %in% colnames(targets)]
-      stop(paste("'targets' is missing the following required column(s):", paste(missing_cols, collapse = ", ")))
+      stop(paste("'targets' is missing the following required column(s):",
+                 paste(missing_cols, collapse = ", ")))
     }
   }
   if (pattern == "ID_Position") {
     targets <- read.csv(targets_dir)
     required_cols <- c("Sample_Name", "Sentrix_ID", "Sentrix_Position")
     if (all(required_cols %in% colnames(targets))) {
-      targets$Basename <- paste0(idat_dir, "/", targets$Sentrix_ID, "_", targets$Sentrix_Position)
+      targets$Basename <- paste0(idat_dir,
+                                 "/",
+                                 targets$Sentrix_ID,
+                                 "_",
+                                 targets$Sentrix_Position)
     } else {
       missing_cols <- required_cols[!required_cols %in% colnames(targets)]
-      stop(paste("'targets' is missing the following required column(s):", paste(missing_cols, collapse = ", ")))
+      stop(paste("'targets' is missing the following required column(s):",
+                 paste(missing_cols, collapse = ", ")))
     }
   }
-  rgSet <- read.metharray.exp(targets = targets, extended = T)
-  gc()
+  rgSet <- read.metharray.exp(targets = targets, extended = TRUE)
   colData(rgSet)$Basename <- NULL
   colData(rgSet)$filenames <- NULL
   ####### 创建环境###

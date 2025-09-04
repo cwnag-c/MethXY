@@ -101,9 +101,10 @@ validationCellType <- function(Y, pheno, modelFix, modelBatch = NULL,
 #'     and the package is licensed under GPL-3.
 #' @source https://bioconductor.org/packages/FlowSorted.Blood.EPIC/
 #' @author Original authors of FlowSorted.Blood.EPIC
-#' @importFrom minfi preprocessRaw mapToGenome getSex sampleNames fixMethOutliers getBeta convertArray annotation combineArrays
+#' @importFrom minfi preprocessRaw mapToGenome getSex sampleNames
+#'     fixMethOutliers getBeta convertArray annotation combineArrays
 #' @importFrom FlowSorted.Blood.EPIC projectCellType_CP libraryDataGet
-#' @importFrom magrittr '%<>%' '%>%'
+#' @importFrom magrittr '%>%'
 #' @importFrom dplyr rename select mutate
 #' @importFrom nlme lme getVarCov
 #' @importFrom SummarizedExperiment rowRanges colData colData<-
@@ -121,23 +122,27 @@ validationCellType <- function(Y, pheno, modelFix, modelBatch = NULL,
 #'
 #' @return cell proportion
 #' @export
-estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, CustomCpGs = NULL, returnAll = FALSE,
-                                      meanPlot = FALSE, verbose = TRUE, lessThanOne = FALSE, cellcounts = NULL) {
+estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL,
+                                      CustomCpGs = NULL, returnAll = FALSE,
+                                      meanPlot = FALSE, verbose = TRUE,
+                                      lessThanOne = FALSE, cellcounts = NULL) {
   # 先检查依赖包是否安装
   ### parameter
   probeSelect <- "IDOL"
   cellTypes <- c("CD8T", "CD4T", "NK", "Bcell", "Mono", "Neu")
   referencePlatform <- "IlluminaHumanMethylationEPIC"
-  processMethod <- "preprocessQuantile"
+  #processMethod <- "preprocessQuantile"
   compositeCellType <- "Blood"
-  rgPlatform <- sub("IlluminaHumanMethylation", "", annotation(GenomicMethylSet)[which(names(annotation(GenomicMethylSet)) == "array")])
+  rgPlatform <- sub("IlluminaHumanMethylation", "",
+                    annotation(GenomicMethylSet)[
+                      which(names(annotation(GenomicMethylSet)) == "array")])
   platform <- sub("IlluminaHumanMethylation", "", referencePlatform)
 
   referencePkg <- sprintf(
     "FlowSorted.%s.%s", compositeCellType,
     platform
   )
-  subverbose <- max(as.integer(verbose) - 1L, 0L)
+  #subverbose <- max(as.integer(verbose) - 1L, 0L)
 
 
   if (!is.null(referenceset)) {
@@ -149,10 +154,12 @@ estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, Cus
     }
   } else {
     if (!require(referencePkg, character.only = TRUE) &&
-      referencePkg != "FlowSorted.BloodExtended.EPIC") {
+          referencePkg != "FlowSorted.BloodExtended.EPIC") {
       stop(strwrap(
         sprintf(
-          "Could not find reference data package for\n                                compositeCellType '%s' and referencePlatform\n                                '%s' (inferred package name is '%s')",
+          "Could not find reference data package for\n
+          compositeCellType '%s' and referencePlatform\n
+          '%s' (inferred package name is '%s')",
           compositeCellType, platform, referencePkg
         ),
         width = 80,
@@ -160,21 +167,25 @@ estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, Cus
       ))
     }
     if (!require(referencePkg, character.only = TRUE) &&
-      referencePkg == "FlowSorted.BloodExtended.EPIC") {
+          referencePkg == "FlowSorted.BloodExtended.EPIC") {
       stop(strwrap(
         sprintf(
-          "Could not find reference data package for\n                                compositeCellType '%s' and referencePlatform\n                                '%s' (inferred package name is '%s'),\n                                please contact\n                                Technology.Transfer@dartmouth.edu",
+          "Could not find reference data package for\n
+          compositeCellType '%s' and referencePlatform\n
+          '%s' (inferred package name is '%s'),\n
+          please contact\n
+          Technology.Transfer@dartmouth.edu",
           compositeCellType, platform, referencePkg
         ),
         width = 80,
         prefix = " ", initial = ""
       ))
     }
-    if ((referencePkg != "FlowSorted.Blood.EPIC") && (referencePkg !=
-      "FlowSorted.CordBloodCombined.450k")) {
+    if ((referencePkg != "FlowSorted.Blood.EPIC") &&
+          (referencePkg != "FlowSorted.CordBloodCombined.450k")) {
       referenceRGset <- get(referencePkg)
-    } else if ((referencePkg == "FlowSorted.Blood.EPIC") |
-      (referencePkg == "FlowSorted.CordBloodCombined.450k")) {
+    } else if ((referencePkg == "FlowSorted.Blood.EPIC") ||
+                 (referencePkg == "FlowSorted.CordBloodCombined.450k")) {
       referenceRGset <- libraryDataGet(referencePkg)
     }
   }
@@ -187,7 +198,9 @@ estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, Cus
   if (!all(cellTypes %in% referenceRGset$CellType)) {
     stop(strwrap(
       sprintf(
-        "all elements of argument 'cellTypes' needs to be\n                            part of the reference phenoData columns 'CellType'\n                            (containg the following elements: '%s')",
+        "all elements of argument 'cellTypes' needs to be\n
+        part of the reference phenoData columns 'CellType'\n
+        (containg the following elements: '%s')",
         paste(unique(referenceRGset$cellType), collapse = "', '")
       ),
       width = 80, prefix = " ", initial = ""
@@ -205,7 +218,8 @@ estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, Cus
     }
   }
   if (verbose) {
-    message(strwrap("[estimateCellCounts2_GMset] Combining user data with\n                        reference (flow sorted) data.\n",
+    message(strwrap("[estimateCellCounts2_GMset] Combining user data with\n
+                    reference (flow sorted) data.\n",
       width = 80, prefix = " ", initial = ""
     ))
   }
@@ -236,7 +250,8 @@ estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, Cus
   } else {
     try(referenceRGset$Age <- as.numeric(referenceRGset$Age))
   }
-  commoncolumn <- intersect(names(colData(GenomicMethylSet)), names(colData(referenceRGset)))
+  commoncolumn <- intersect(names(colData(GenomicMethylSet)),
+                            names(colData(referenceRGset)))
   restry <- try(
     {
       colData(GenomicMethylSet)[commoncolumn] <- mapply(
@@ -272,41 +287,54 @@ estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, Cus
   referenceGMset <- mapToGenome(referenceRGset)
   reference_sex <- getSex(referenceGMset)
   rm(referenceRGset) ##### predict Sex
-  ## 合并sex信息#
   reference_sex <- as.data.frame(reference_sex)
-  reference_sex %<>% select(predictedSex) %>%
-    rename(Sex = predictedSex) %>%
-    mutate(samplename = rownames(reference_sex))
+  if ("predictedSex" %in% colnames(reference_sex)) {
+    reference_sex <- reference_sex %>%
+      select(predictedSex) %>%
+      rename(Sex = predictedSex) %>%
+      mutate(samplename = rownames(reference_sex))
+  }else {
+    stop("Error: 'predictedSex' column does not exist")
+  }
   GM_sex <- as.data.frame(colData(GenomicMethylSet))
-  GM_sex %<>% select(Sex) %>% mutate(samplename = rownames(GM_sex))
+  if ("Sex" %in% colnames(GM_sex)) {
+    GM_sex <- GM_sex %>%
+      select(Sex) %>%
+      mutate(samplename = rownames(GM_sex))
+  }else {
+    stop("Error: 'predictedSex' column does not exist.")
+  }
   combined_Sex <- rbind(GM_sex, reference_sex)
-
-  combinedGMset <- combineArrays(GenomicMethylSet, referenceGMset, outType = referencePlatform)
+  combinedGMset <- combineArrays(GenomicMethylSet, referenceGMset,
+                                 outType = referencePlatform)
   colData(combinedGMset) <- newpd
   colnames(combinedGMset) <- newpd$sampleNames
   GenomicMethylSet_colnames <- colnames(GenomicMethylSet)
   GenomicMethylSet_col <- colData(GenomicMethylSet)
   rm(referenceGMset, GenomicMethylSet)
-  combined_Sex <- combined_Sex[match(sampleNames(combinedGMset), rownames(combined_Sex)), ] # 对齐
+  combined_Sex <- combined_Sex[match(sampleNames(combinedGMset),
+                                     rownames(combined_Sex)), ]
   if (verbose) {
-    message(strwrap("[estimateCellCounts2_GMset] Processing user and reference\n                        data together.\n",
+    message(strwrap("[estimateCellCounts2_GMset] Processing user and reference\n
+                    data together.\n",
       width = 80, prefix = " ", initial = ""
     ))
   }
   combinedGMset <- fixMethOutliers(combinedGMset)
   gc()
-  combinedGMset <- preprocessQuantile(combinedGMset, fixOutliers = F, sex = combined_Sex$Sex)
+  combinedGMset <- preprocessQuantile(combinedGMset, fixOutliers = FALSE,
+                                      sex = combined_Sex$Sex)
   gc()
 
-  referenceMset <- combinedGMset[, combinedGMset$studyIndex ==
-    "reference"]
+  referenceMset <- combinedGMset[, combinedGMset$studyIndex == "reference"]
   colData(referenceMset) <- as(referencePd, "DataFrame")
   mSet <- combinedGMset[, combinedGMset$studyIndex == "user"]
   colData(mSet) <- as(GenomicMethylSet_col, "DataFrame")
   rm(combinedGMset)
   if (probeSelect != "IDOL") {
     if (verbose) {
-      message(strwrap("[estimateCellCounts2_GMset] Picking probes for\n                            composition estimation.\n",
+      message(strwrap("[estimateCellCounts2_GMset] Picking probes for\n
+                      composition estimation.\n",
         width = 80, prefix = " ", initial = ""
       ))
     }
@@ -321,11 +349,15 @@ estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, Cus
 
     coefs <- compData$coefEsts
     if (verbose) {
-      message(strwrap("[estimateCellCounts2_GMset] Estimating  proportion\n                            composition (prop), if you provide cellcounts\n                            those will be provided as counts in the\n                            composition estimation.\n",
+      message(strwrap("[estimateCellCounts2_GMset] Estimating  proportion\n
+                      composition (prop), if you provide cellcounts\n
+                      those will be provided as counts in the\n
+                      composition estimation.\n",
         width = 80, prefix = " ", initial = ""
       ))
     }
-    prop <- projectCellType_CP(getBeta(mSet)[rownames(coefs), ], coefs, lessThanOne = lessThanOne)
+    prop <- projectCellType_CP(getBeta(mSet)[rownames(coefs), ], coefs,
+                               lessThanOne = lessThanOne)
     prop <- round(prop, 4)
     rownames(prop) <- GenomicMethylSet_colnames
     counts <- round(prop * cellcounts, 0)
@@ -339,7 +371,8 @@ estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, Cus
     }
   } else {
     if (verbose) {
-      message(strwrap("[estimateCellCounts2_GMset] Using IDOL L-DMR probes for\n                            composition estimation.\n",
+      message(strwrap("[estimateCellCounts2_GMset] Using IDOL L-DMR probes for\n
+                      composition estimation.\n",
         width = 80, prefix = " ", initial = ""
       ))
     }
@@ -348,7 +381,8 @@ estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, Cus
     rm(referenceMset)
     if (!is.null(cellTypes)) {
       if (!all(cellTypes %in% pd$CellType)) {
-        stop(strwrap("elements of argument 'cellTypes' are not part of\n                            'referenceMset$CellType'",
+        stop(strwrap("elements of argument 'cellTypes' are not part of\n
+                     'referenceMset$CellType'",
           width = 80, prefix = " ", initial = ""
         ))
       }
@@ -368,23 +402,16 @@ estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, Cus
       2
     ]))
     names(compTable)[1] <- "Fstat"
-    names(compTable)[c(-2, -1, 0) + ncol(compTable)] <- c("low", "high", "range")
-    tstatList <- lapply(tIndexes, function(i) {
-      x <- rep(0, ncol(p))
-      x[i] <- 1
-      return(rowttests(p, factor(x)))
-    })
+    names(compTable)[c(-2, -1, 0) + ncol(compTable)] <- c("low", "high",
+                                                          "range")
     trainingProbes <- CustomCpGs
-    trainingProbes <- trainingProbes[trainingProbes %in%
-      rownames(p)]
+    trainingProbes <- trainingProbes[trainingProbes %in% rownames(p)]
     p <- p[trainingProbes, ]
     pMeans <- colMeans(p)
     names(pMeans) <- pd$CellType
-    form <- as.formula(sprintf("y ~ %s - 1", paste(levels(pd$CellType),
-      collapse = "+"
-    )))
-    phenoDF <- as.data.frame(model.matrix(~ pd$CellType -
-      1))
+    form <- as.formula(sprintf("y ~ %s - 1",
+                               paste(levels(pd$CellType), collapse = "+")))
+    phenoDF <- as.data.frame(model.matrix(~ pd$CellType - 1))
     colnames(phenoDF) <- sub("^pd\\$CellType", "", colnames(phenoDF))
     if (ncol(phenoDF) == 2) {
       X <- as.matrix(phenoDF)
@@ -403,11 +430,15 @@ estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, Cus
       sampleMeans = pMeans
     )
     if (verbose) {
-      message(strwrap("[estimateCellCounts2_GMset] Estimating  proportion\n                            composition (prop), if you provide cellcounts\n                            those will be provided as counts in the\n                            composition estimation.\n",
+      message(strwrap("[estimateCellCounts2_GMset] Estimating  proportion\n
+                      composition (prop), if you provide cellcounts\n
+                      those will be provided as counts in the\n
+                      composition estimation.\n",
         width = 80, prefix = " ", initial = ""
       ))
     }
-    prop <- projectCellType_CP(getBeta(mSet)[rownames(coefs), ], coefs, lessThanOne = lessThanOne)
+    prop <- projectCellType_CP(getBeta(mSet)[rownames(coefs), ],
+                               coefs, lessThanOne = lessThanOne)
     prop <- round(prop, 4)
     rownames(prop) <- GenomicMethylSet_colnames
     counts <- round(prop * cellcounts, 0)
@@ -437,13 +468,15 @@ estimateCellCounts2_GMset <- function(GenomicMethylSet, referenceset = NULL, Cus
 #' @param probeSelect probeSelect
 #'
 #' @return res
-pickCompProbes <- function(mSet, cellTypes = NULL, numProbes = 50, compositeCellType = compositeCellType,
+pickCompProbes <- function(mSet, cellTypes = NULL, numProbes = 50,
+                           compositeCellType = compositeCellType,
                            probeSelect = probeSelect) {
   p <- getBeta(mSet)
   pd <- as.data.frame(colData(mSet))
   if (!is.null(cellTypes)) {
     if (!all(cellTypes %in% pd$CellType)) {
-      stop(strwrap("elements of argument 'cellTypes' are not part of\n                        'mSet$CellType'",
+      stop(strwrap("elements of argument 'cellTypes' are not part of\n
+                   'mSet$CellType'",
         width = 80, prefix = " ", initial = ""
       ))
     }
@@ -454,14 +487,12 @@ pickCompProbes <- function(mSet, cellTypes = NULL, numProbes = 50, compositeCell
   pd$CellType <- factor(pd$CellType, levels = cellTypes)
   ffComp <- rowFtests(p, pd$CellType)
   tIndexes <- split(seq(along = pd$CellType), pd$CellType)
-  prof <- vapply(tIndexes, function(i) rowMeans(p[, i]), FUN.VALUE = numeric(dim(p)[1]))
+  prof <- vapply(tIndexes, function(i) rowMeans(p[, i]),
+                 FUN.VALUE = numeric(dim(p)[1]))
   r <- rowRanges(p)
   compTable <- cbind(ffComp, prof, r, abs(r[, 1] - r[, 2]))
   names(compTable)[1] <- "Fstat"
-  names(compTable)[c(-2, -1, 0) + ncol(compTable)] <- c(
-    "low",
-    "high", "range"
-  )
+  names(compTable)[c(-2, -1, 0) + ncol(compTable)] <- c("low", "high", "range")
   tstatList <- lapply(tIndexes, function(i) {
     x <- rep(0, ncol(p))
     x[i] <- 1
@@ -485,9 +516,8 @@ pickCompProbes <- function(mSet, cellTypes = NULL, numProbes = 50, compositeCell
   p <- p[trainingProbes, ]
   pMeans <- colMeans(p)
   names(pMeans) <- pd$CellType
-  form <- as.formula(sprintf("y ~ %s - 1", paste(levels(pd$CellType),
-    collapse = "+"
-  )))
+  form <- as.formula(sprintf("y ~ %s - 1",
+                             paste(levels(pd$CellType), collapse = "+")))
   phenoDF <- as.data.frame(model.matrix(~ pd$CellType - 1))
   colnames(phenoDF) <- sub("^pd\\$CellType", "", colnames(phenoDF))
   if (ncol(phenoDF) == 2) {

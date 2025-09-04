@@ -1,5 +1,6 @@
 #' preprocess.norm
-#' @importFrom minfi sampleNames getAnnotation featureNames ratioConvert GenomicMethylSet preprocessQuantile
+#' @importFrom minfi sampleNames getAnnotation featureNames
+#'     ratioConvert GenomicMethylSet preprocessQuantile
 #' @param DNAm_env Output returned by preprocess.filter
 #' @param Norm  "preprocessQuantile"
 #' @param save_result_locally Save results to local directory; default is FALSE
@@ -13,9 +14,9 @@
 #'
 preprocess.norm <- function(DNAm_env,
                             Norm = "preprocessQuantile",
-                            save_result_locally = F,
+                            save_result_locally = FALSE,
                             save_dir = "./",
-                            return_res = T) {
+                            return_res = TRUE) {
   UniqueID <- DNAm_env$uniqueID
   DNAm_GRSet <- list()
   ## reconstruct
@@ -25,23 +26,39 @@ preprocess.norm <- function(DNAm_env,
   probeX <- rownames(Annotation[lines_X, ])
   DNAm_env$GenomicMethylSet_X <- DNAm_env$GenomicMethylSet[probeX, ]
   probeAuto <- setdiff(featureNames(DNAm_env$GenomicMethylSet), probeX)
-  DNAm_env$GenomicMethylSet <- DNAm_env$GenomicMethylSet[probeAuto, ] # Contains only autosomes
+  DNAm_env$GenomicMethylSet <- DNAm_env$GenomicMethylSet[probeAuto, ]
 
   if (is.null(Norm)) {
-    DNAm_GRSet$GRSet <- ratioConvert(DNAm_env$GenomicMethylSet, what = "M", keepCN = F)
-    DNAm_GRSet$GRSet_Y <- ratioConvert(DNAm_env$GenomicMethylSet_Y, what = "M", keepCN = F)
-    DNAm_GRSet$GRSet_X <- ratioConvert(DNAm_env$GenomicMethylSet_X, what = "M", keepCN = F)
-    rm(list = c("GenomicMethylSet", "GenomicMethylSet_Y", "GenomicMethylSet_X"), envir = DNAm_env)
+    DNAm_GRSet$GRSet <- ratioConvert(DNAm_env$GenomicMethylSet,
+                                     what = "M", keepCN = FALSE)
+    DNAm_GRSet$GRSet_Y <- ratioConvert(DNAm_env$GenomicMethylSet_Y,
+                                       what = "M", keepCN = FALSE)
+    DNAm_GRSet$GRSet_X <- ratioConvert(DNAm_env$GenomicMethylSet_X,
+                                       what = "M", keepCN = FALSE)
+    rm(list = c("GenomicMethylSet", "GenomicMethylSet_Y", "GenomicMethylSet_X"),
+       envir = DNAm_env)
   } else {
     if (Norm == "preprocessQuantile") {
       ## Note: For Quantile, only M and CN are returned; beta values are not
-      DNAm_GRSet$GRSet <- preprocessQuantile(DNAm_env$GenomicMethylSet, sex = colData(DNAm_env$GenomicMethylSet)$Gender)
-      DNAm_GRSet$GRSet_Y <- preprocessQuantile(DNAm_env$GenomicMethylSet_Y, sex = colData(DNAm_env$GenomicMethylSet_Y)$Gender)
-      DNAm_GRSet$GRSet_X <- preprocessQuantile(DNAm_env$GenomicMethylSet_X, sex = colData(DNAm_env$GenomicMethylSet_X)$Gender)
+      DNAm_GRSet$GRSet <- preprocessQuantile(
+        DNAm_env$GenomicMethylSet,
+        sex = colData(DNAm_env$GenomicMethylSet)$Gender
+      )
+      DNAm_GRSet$GRSet_Y <- preprocessQuantile(
+        DNAm_env$GenomicMethylSet_Y,
+        sex = colData(DNAm_env$GenomicMethylSet_Y)$Gender
+      )
+      DNAm_GRSet$GRSet_X <- preprocessQuantile(
+        DNAm_env$GenomicMethylSet_X,
+        sex = colData(DNAm_env$GenomicMethylSet_X)$Gender
+      )
       DNAm_GRSet$GRSet@assays@data@listData[["CN"]] <- NULL
       DNAm_GRSet$GRSet_Y@assays@data@listData[["CN"]] <- NULL
       DNAm_GRSet$GRSet_X@assays@data@listData[["CN"]] <- NULL
-      rm(list = c("GenomicMethylSet", "GenomicMethylSet_Y", "GenomicMethylSet_X"), envir = DNAm_env)
+      rm(list = c("GenomicMethylSet",
+                  "GenomicMethylSet_Y",
+                  "GenomicMethylSet_X"),
+         envir = DNAm_env)
     } else {
       message("Warning: Invalid input")
     }

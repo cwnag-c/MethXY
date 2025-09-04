@@ -6,11 +6,6 @@
 #' @export
 beadcount2 <- function(x) {
   nb <- getNBeads(x)
-  typeIadd <- getProbeInfo(x, type = "I")
-  typeImatchA <- match(typeIadd$AddressA, rownames(nb))
-  typeImatchB <- match(typeIadd$AddressB, rownames(nb))
-  typeIIadd <- getProbeInfo(x, type = "II")
-  typeIImatch <- match(typeIIadd$Address, rownames(nb))
   nbcg <- nb
   locusNames <- getManifestInfo(x, "locusNames")
   bc_temp <- matrix(NA_real_,
