@@ -1,6 +1,6 @@
 Package: MethXY
 Title: Sex Chromosome Analysis for DNA Methylation Arrays
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: 
     person("Chao", "Wang", , "cwang9973@163.com", role = c("aut", "cre"))
 Description: This package provides tools for analyzing sex chromosomes 
