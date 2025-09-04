@@ -11,7 +11,6 @@
 #'    GRSet without sex chromosomes,GRSet with X ,GRSet with Y ,
 #'    and the targets table
 #' @export
-#'
 preprocess.norm <- function(DNAm_env,
                             Norm = "preprocessQuantile",
                             save_result_locally = FALSE,
