@@ -72,18 +72,17 @@ preprocess.filter <- function(DNAm_env) {
   )) {
     colData(GenomicMethylSet)$Gender <- sex_merge
   } else {
-    stop("The row names of colData(GenomicMethylSet)
-    do not match the names of sex_merge.
-         Cannot safely assign gender values.")
+    stop("The sample names of the predicted sex do not match those in colData(GenomicMethylSet),\n",
+         "so the predicted sex cannot be merged into the metadata.")
   }
   targets <- as.data.frame(colData(GenomicMethylSet))
   discordance <- targets[targets$Gender != targets$predictedSex, ]
   targets <- targets[targets$Gender == targets$predictedSex, ]
   if (nrow(discordance) == 0) {
     ## message#
-    message("All samples are cordance between reported and predicted sex")
+    message("All samples have identical reported and predicted sex")
     remove_sample_text <-
-      "All samples are cordance between reported and predicted sex"
+      "All samples have identical reported and predicted sex"
     Message$remove_sample_text <- remove_sample_text
   } else {
     # Check whether pd$Sample_Name is a subset of
@@ -97,7 +96,9 @@ preprocess.filter <- function(DNAm_env) {
       "\n", paste0(discordance, "\n")
     )
     remove_sample_text <- paste0(
-      paste0(number_discordance, " samples !! are discordance and removed :"),
+      paste0(
+        number_discordance,
+        " samples show discordance between reported and predicted sex and were removed:"),
       "\n", paste0(discordance, "\n")
     )
     Message$remove_sample_text <- remove_sample_text
@@ -249,15 +250,15 @@ preprocess.filter <- function(DNAm_env) {
       filter_xy <- filter_xy_850k
     }
   }
-  remove_probe_Y <- filter_xy[(!(filter_xy$MASK_X_transposed_region == "F" &
-                                   filter_xy$MASK_Cancer_testis_gene == "F" &
-                                   filter_xy$MASK_SINE_LINE == "F" &
-                                   filter_xy$MASK_AnyRepetitive == "F")) &
+  remove_probe_Y <- filter_xy[(!(filter_xy$MASK_X_transposed_region == F &
+                                   filter_xy$MASK_Cancer_testis_gene == F &
+                                   filter_xy$MASK_SINE_LINE == F &
+                                   filter_xy$MASK_AnyRepetitive == F)) &
                                 filter_xy$chr == "chrY", ]$probeID
-  remove_probe_X <- filter_xy[(!(filter_xy$MASK_X_transposed_region == "F" &
-                                   filter_xy$MASK_Cancer_testis_gene == "F" &
-                                   filter_xy$MASK_SINE_LINE == "F" &
-                                   filter_xy$MASK_AnyRepetitive == "F")) &
+  remove_probe_X <- filter_xy[(!(filter_xy$MASK_X_transposed_region == F &
+                                   filter_xy$MASK_Cancer_testis_gene == F &
+                                   filter_xy$MASK_SINE_LINE == F &
+                                   filter_xy$MASK_AnyRepetitive == F)) &
                                 filter_xy$chr == "chrX", ]$probeID
 
   GenomicMethylSet <-
